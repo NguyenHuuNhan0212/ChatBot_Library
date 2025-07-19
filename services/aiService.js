@@ -38,29 +38,6 @@ class AIService {
     return data;
   }
 
-  //
-  //   async processUserQuery(userMessage, historyContext = []) {
-  //     try {
-  //       const intent = await this.analyzeIntent(userMessage);
-
-  //       let data = await this.executeQuery(intent, userMessage);
-
-  //       data = await this.addBookUrls(data);
-  //       const response = await this.generateResponse(
-  //         intent,
-  //         data,
-  //         userMessage,
-  //         historyContext
-  //       );
-
-  //       return response;
-  //     } catch (error) {
-  //       console.error("Lỗi xử lý query:", error);
-  //       return "Xin lỗi, tôi không thể xử lý câu hỏi này. Vui lòng thử lại.";
-  //     }
-  //   }
-  // file: AIService.js
-
   async processUserQuery(userMessage, historyContext = []) {
     try {
       // ✅ TRUYỀN `historyContext` VÀO ĐÂY
@@ -83,70 +60,6 @@ class AIService {
       return "Xin lỗi, tôi không thể xử lý câu hỏi này. Vui lòng thử lại.";
     }
   }
-
-  //   async analyzeIntent(userMessage) {
-  //     const prompt = `
-  // Phân tích ý định của người dùng từ câu hỏi về thư viện sau:
-  // "${userMessage}"
-
-  // Trả về JSON với format:
-  // {
-  //   "intent": "search_book|search_publisher|search_author|search_category|book_details|book_availability|popular_books|library_stats|general_info",
-  //   "entities": {
-  //     "book_name": "tên sách nếu có",
-  //     "author_name": "tên tác giả nếu có",
-  //     "category_name": "tên loại sách nếu có",
-  //     "publisher_name": "tên nhà xuất bản nếu có",
-  //     "book_code": "mã sách nếu có"
-  //   },
-  //   "confidence": 0.95
-  // }
-
-  // Các intent và ví dụ:
-  // - search_book: "tìm sách Harry Potter", "sách về lập trình"
-  // - search_author: "sách của Nguyễn Nhật Ánh", "tác phẩm Tô Hoài"
-  // - search_category: "sách thiếu nhi", "truyện tranh", "sách khoa học", "tiểu thuyết"
-  // - search_publisher: "sách NXB Trẻ", "Kim Đồng xuất bản"
-  // - book_details: "chi tiết sách MS001", "thông tin sách mã ABC"
-  // - book_availability: "sách này còn không", "kiểm tra tình trạng"
-  // - popular_books: "sách phổ biến", "sách hay nhất"
-  // - library_stats: "thống kê thư viện", "tổng số sách"
-  // - general_info: "giờ mở cửa", "quy định thư viện"
-
-  // LƯU Ý:
-  // - "sách thiếu nhi" => intent: "search_category", category_name: "thiếu nhi"
-  // - "truyện tranh" => intent: "search_category", category_name: "truyện tranh"
-  // - "sách khoa học" => intent: "search_category", category_name: "khoa học"
-
-  // Chỉ trả về JSON, không giải thích thêm.
-  // `;
-
-  //     const response = await openai.chat.completions.create({
-  //       model: "gpt-3.5-turbo",
-  //       messages: [{ role: "user", content: prompt }],
-  //       temperature: 0.1,
-  //     });
-
-  //     try {
-  //       const result = JSON.parse(response.choices[0].message.content);
-  //       console.log("Intent analysis result:", result); // Debug log
-  //       return result;
-  //     } catch (error) {
-  //       console.error("Intent parsing error:", error);
-  //       // Fallback nếu parse JSON thất bại
-  //       return {
-  //         intent: "general_info",
-  //         entities: {},
-  //         confidence: 0.5,
-  //       };
-  //     }
-  //   }
-
-  // file: AIService.js
-
-  // ✅ THÊM `historyContext` VÀO CHỮ KÝ HÀM
-  // file: AIService.js
-
   async analyzeIntent(userMessage, historyContext = []) {
     const formattedHistory = historyContext
       .map((item) => `${item.role}: ${item.content}`)
@@ -174,7 +87,11 @@ ${formattedHistory}
 *   **search_author**: Tìm sách của một tác giả cụ thể.
     *   Ví dụ: "sách của Nam Cao", "tác phẩm của Tô Hoài"
     *   Entities: { "author_name": "..." }
-
+    
+*   **search_year**: Tìm sách theo năm xuất bản.
+    *   Ví dụ: "các sách xuất bản năm 2020", "năm xuất bản 2017 có sách nào"
+    *   Entities: { "publisher_year": "..." }
+  
 *   **search_category**: Tìm sách thuộc một thể loại cụ thể. **LUÔN ƯU TIÊN INTENT NÀY KHI THẤY CÁC TỪ KHÓA "THỂ LOẠI", "LOẠI", "TRUYỆN", "SÁCH ... HỌC".**
     *   Ví dụ: "tìm sách thể loại văn học", "có truyện tranh không?", "sách khoa học", "tiểu thuyết"
     *   Entities: { "category_name": "..." }
@@ -203,7 +120,8 @@ Format JSON:
     "book_name": "tên sách nếu có",
     "author_name": "tên tác giả nếu có",
     "category_name": "tên thể loại nếu có",
-    "publisher_name": "tên NXB nếu có"
+    "publisher_name": "tên NXB nếu có",
+    "publisher_year": "năm xuất bản nếu có"
   }
 }
 `;
@@ -247,6 +165,11 @@ Format JSON:
           );
         }
         break;
+      case "search_year":
+        if (entities.publisher_year) {
+          return await queryService.searchBooksByYear(entities.publisher_year);
+        }
+        break;
       case "search_author":
         if (entities.author_name) {
           return await queryService.searchBooksByAuthor(entities.author_name);
@@ -262,10 +185,6 @@ Format JSON:
         break;
 
       case "book_details":
-        // if (entities.book_code) {
-        //   return await queryService.getBookDetails(entities.book_code);
-        // }
-        // break;
         if (entities.book_code) {
           return await queryService.getBookDetails(entities.book_code);
         }

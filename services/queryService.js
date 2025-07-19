@@ -101,33 +101,6 @@ class QueryService {
       throw new Error(`Lỗi lấy thông tin sách: ${error.message}`);
     }
   }
-  // nhà xuất bản
-  //   async searchBooksByPublisher(publisherName) {
-  //     const publisher = await bangNXB.findOne({
-  //       TenNXB: { $regex: new RegExp(publisherName, "i") },
-  //     });
-
-  //     if (!publisher) return [];
-
-  //     const books = await bangSachCopy.find({ MaNXB: publisher._id }).populate([
-  //       {
-  //         path: "MaSach",
-  //         populate: [
-  //           { path: "TacGia" },
-  //           {
-  //             path: "MaLoai",
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         path: "MaNXB",
-  //       },
-  //       {
-  //         path: "MaViTri",
-  //       },
-  //     ]);
-  //     return books;
-  //   }
   async searchBooksByPublisher(publisherName) {
     const publisher = await bangNXB.findOne({
       TenNXB: { $regex: new RegExp(publisherName, "i") },
@@ -201,6 +174,21 @@ class QueryService {
       };
     } catch (error) {
       throw new Error(`Lỗi kiểm tra tình trạng sách: ${error.message}`);
+    }
+  }
+  //lấy sách theo năm xuất bản
+  async searchBooksByYear(nam) {
+    try {
+      const books = await bangSach
+        .find({ NamXuatBan: nam })
+        .select("-image")
+        .populate("TacGia", "TenTG")
+        .populate("MaLoai", "TenLoai")
+        .limit(10); // Hoặc thêm phân trang nếu muốn
+
+      return books;
+    } catch (error) {
+      throw new Error(`Lỗi tìm kiếm theo năm xuất bản: ${error.message}`);
     }
   }
 
