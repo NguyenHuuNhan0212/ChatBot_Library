@@ -100,6 +100,10 @@ ${formattedHistory}
     *   Ví dụ: "sách của nhà xuất bản Kim Đồng", "NXB Trẻ có sách gì hay?"
     *   Entities: { "publisher_name": "..." }
 
+*   **popular_books**: Tìm các sách phổ biến. **LUÔN ƯU TIÊN INTENT NÀY KHI THẤY "SÁCH PHỔ BIẾN", "SÁCH HOT", "SÁCH MƯỢN NHIỀU NHẤT".**
+    *   Ví dụ: "sách phổ biến của thư viên", "những quyển sách hot nhất?"
+    *   Entities: { "popular_books": "..." }
+    
 *   **book_details**: Hỏi thông tin chi tiết về một cuốn sách đã được đề cập.
     *   Ví dụ (sau khi bot trả lời về sách 'Kim Đồng'): "nó của tác giả nào?", "thông tin chi tiết"
     *   Suy luận từ ngữ cảnh để điền 'book_name'.
@@ -121,7 +125,8 @@ Format JSON:
     "author_name": "tên tác giả nếu có",
     "category_name": "tên thể loại nếu có",
     "publisher_name": "tên NXB nếu có",
-    "publisher_year": "năm xuất bản nếu có"
+    "publisher_year": "năm xuất bản nếu có",
+    "popular_books": "sách phổ biến nếu có"
   }
 }
 `;

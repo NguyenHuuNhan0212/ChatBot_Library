@@ -193,7 +193,7 @@ class QueryService {
   }
 
   // Lấy danh sách sách phổ biến
-  async getPopularBooks(limit = 10) {
+  async getPopularBooks(limit = 5) {
     try {
       const books = await bangSach
         .find()
