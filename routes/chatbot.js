@@ -15,7 +15,7 @@ router.post("/chat", verifyTokenUser, async (req, res) => {
       });
     }
 
-    // 🔁 Lấy 5 lịch sử chat gần nhất của người dùng này
+    // Lấy 5 lịch sử chat gần nhất của người dùng này
     const recentHistory = await ChatLog.find({ MaDocGia })
       .sort({ createdAt: -1 })
       .limit(5);
@@ -33,10 +33,10 @@ router.post("/chat", verifyTokenUser, async (req, res) => {
         }))
       );
 
-    // 🔍 Gửi sang AI để xử lý, với ngữ cảnh hội thoại
+    // Gửi sang AI để xử lý, với ngữ cảnh hội thoại
     const response = await aiService.processUserQuery(message, historyContext);
 
-    // 💾 Lưu lại câu hỏi - câu trả lời
+    // Lưu lại câu hỏi - câu trả lời
     await ChatLog.create({
       MaDocGia,
       question: message,

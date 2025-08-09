@@ -40,13 +40,13 @@ class AIService {
 
   async processUserQuery(userMessage, historyContext = []) {
     try {
-      // ✅ TRUYỀN `historyContext` VÀO ĐÂY
       const intent = await this.analyzeIntent(userMessage, historyContext);
 
       let data = await this.executeQuery(intent, userMessage);
 
       // ... phần còn lại của hàm giữ nguyên
       data = await this.addBookUrls(data);
+
       const response = await this.generateResponse(
         intent,
         data,
@@ -65,7 +65,6 @@ class AIService {
       .map((item) => `${item.role}: ${item.content}`)
       .join("\n");
 
-    // Thay thế toàn bộ biến `prompt` trong hàm `analyzeIntent`
     const prompt = `
 Bạn là một AI chuyên phân tích ý định người dùng cho một chatbot thư viện.
 Nhiệm vụ của bạn là phân tích **câu hỏi mới nhất của người dùng** dựa vào **lịch sử trò chuyện** để xác định chính xác ý định (intent) và các thực thể (entities).
@@ -105,8 +104,9 @@ ${formattedHistory}
     *   Entities: { "popular_books": "..." }
     
 *   **book_details**: Hỏi thông tin chi tiết về một cuốn sách đã được đề cập.
-    *   Ví dụ (sau khi bot trả lời về sách 'Kim Đồng'): "nó của tác giả nào?", "thông tin chi tiết"
+    *   Ví dụ (sau khi bot trả lời về sách 'Kim Đồng'): "nó của tác giả nào?", "tác giả là ai?" "thông tin chi tiết", "của nhà xuất bản nào?"
     *   Suy luận từ ngữ cảnh để điền 'book_name'.
+    *   Entities: { "book_name": "..." }
 
 *   **library_statistics**: Hỏi về các số liệu thống kê của thư viện.
     *   Ví dụ: "thống kê thư viện", "có bao nhiêu sách?"
@@ -315,6 +315,7 @@ QUY TẮC XỬ LÝ:
    - Tìm theo tác giả: "Không tìm thấy tác giả này. Bạn có thể thử tên đầy đủ hoặc tác giả khác"
    - Tìm theo thể loại: "Hiện tại chưa có sách thuộc thể loại này. Bạn có thể thử tìm: [gợi ý thể loại tương tự]"
 3. Luôn khuyến khích tìm kiếm thêm và đưa ra gợi ý cụ thể
+4. Nếu người dùng chào tạm biệt hãy chúc họ một ngày tốt lành, vui vẻ, hạnh phúc,....
 
 PHONG CÁCH:
 - Thân thiện, nhiệt tình
