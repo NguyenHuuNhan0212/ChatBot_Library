@@ -1,4 +1,3 @@
-// module.exports = new AIService();
 const openai = require("../configs/openai");
 const queryService = require("./queryService");
 
@@ -83,7 +82,7 @@ ${formattedHistory}
     *   Ví dụ: "tìm sách Chí Phèo", "sách về AI"
     *   Entities: { "book_name": "..." }
 
-*   **search_author**: Tìm sách của một tác giả cụ thể.
+*   **search_author**: Tìm sách của một tác giả cụ thể.**LUÔN ƯU TIÊN INTENT NÀY KHI THẤY "TACGIA", "tác giả".**
     *   Ví dụ: "sách của Nam Cao", "tác phẩm của Tô Hoài"
     *   Entities: { "author_name": "..." }
     
